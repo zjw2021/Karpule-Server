@@ -31,6 +31,10 @@ const userSchema = new Schema ({
     date: {
         type: Date,
         default: Date.now()
+    },
+    stripeId: {
+        type: String,
+        default: null
     }
 });
 
