@@ -14,7 +14,7 @@ const {
 } = require('../controllers/rides')
 
 router.route('/').get(getRides)
-router.route('/:id').get(getRide)
+router.route('/get/:id').get(getRide)
 
 router.route('/create/:id').post(createRide)
 router.route('/edit/:id').put(editRide)
