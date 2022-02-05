@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const JWT_SECRET = "secret"
 
 const User = require('../models/User')
+const Ride = require('../models/Ride')
 const asyncHandler = require('../middleware/asyncHandler')
 
 exports.getUser = asyncHandler(async (req, res, next) => {
@@ -65,6 +66,22 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
     // res.header('x-auth-token', token).send(token);
     res.json({ user, token })
 })
+
+exports.getDriverRides = asyncHandler(async (req, res, next) => {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) {
+        return res.sendStatus(401);
+    }
+
+    if (user.isDriver) {
+        const rides = await Ride.find({ driver: userId });
+        return res.json(rides);
+    }
+    else {
+        return res.sendStatus(403);
+    }
+});
 
 exports.registerDriver = asyncHandler(async (req, res, next) => {
     let user = await User.findById(req.params.id)
