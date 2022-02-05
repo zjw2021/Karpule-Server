@@ -28,15 +28,28 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
 
-    //Save admin to database
-    await user.save();
+    try {
+        if (carModel.length !== 0 && carPlate.length !== 0 && carColor.length !== 0) {
+            user.isDriver = true;
+        }
+        else {
+            user.isDriver = false;
+        }
+    }
+    catch (e) {
+        console.warn("One of carModel, carPlate, carColor was not a string:\n" + e);
+    }
+    finally {
+        //Save admin to database
+        await user.save();
 
-    const payload = { user: { id: user.id } };
+        const payload = { user: { id: user.id } };
 
-    //Sign token and set expiration to 10 minutes
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 600 });
-    // res.header('x-auth-token', token).send(token);
-    res.json({ user, token })
+        //Sign token and set expiration to 10 minutes
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 600 });
+        // res.header('x-auth-token', token).send(token);
+        res.json({ user, token })
+    }
 })
 
 exports.loginUser = asyncHandler(async (req, res, next) => {
