@@ -35,6 +35,10 @@ const userSchema = new Schema ({
     stripeId: {
         type: String,
         default: null
+    },
+    stripeComplete: {
+        type: Boolean,
+        default: false
     }
 });
 
