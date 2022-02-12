@@ -12,14 +12,8 @@ exports.authorizeStripeUser = asyncHandler(async (req, res, next) => {
     const user = await User.findById(userId);
     const userStripeId = user.stripeId;
 
-    // const accountLink = await stripe.accountLinks.create({
-    //     account: userStripeId,
-    //     refresh_url: 'http://localhost:3000/',
-    //     return_url: 'http://localhost:3000/login',
-    //     type: 'account_onboarding'
-    // });
-
-    // return res.status(200).json({ url: accountLink.url });
+    const firstName = user.firstName;
+    const lastName = user.lastName;
 
     const stripeClientId = /* CLIENT_ID */"";
     // Stripe did this in their example: protects from CSRF
@@ -34,8 +28,8 @@ exports.authorizeStripeUser = asyncHandler(async (req, res, next) => {
         'stripe_user[country]': 'US',
         'stripe_user[phone_number]': '0000000000',
         'stripe_user[business_type]': 'individual',
-        'stripe_user[first_name]': 'John',
-        'stripe_user[last_name]': 'Anon',
+        'stripe_user[first_name]': firstName,
+        'stripe_user[last_name]': lastName,
         'stripe_user[dob_day]': '1',
         'stripe_user[dob_month]': '1',
         'stripe_user[dob_year]': '2000',

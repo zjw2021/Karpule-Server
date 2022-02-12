@@ -1,7 +1,14 @@
-
 const { Schema, model } = require('mongoose');
 
 const userSchema = new Schema ({
+    firstName: {
+        type: String,
+        required: [true, 'Please enter your first name']
+    },
+    lastName: {
+        type: String,
+        required: [true, 'Please enter your last name']
+    },
     email: {
         type: String,
         required: [true, 'Please enter your email'],
@@ -21,6 +28,10 @@ const userSchema = new Schema ({
         type: String,
     },
     isDriver: {
+        type: Boolean,
+        default: false
+    },
+    driverVerified: {
         type: Boolean,
         default: false
     },
