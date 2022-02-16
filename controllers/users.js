@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const stripe = require('stripe')(/* CLIENT KEY */'')
 
 const JWT_SECRET = "secret"
 
@@ -14,7 +13,7 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 
 exports.registerUser = asyncHandler(async (req, res, next) => {
     //Destructure request body
-    const { email, password, carModel, carPlate, carColor } = req.body;
+    const { firstName, lastName, email, password, carModel, carPlate, carColor } = req.body;
 
     let user = await User.findOne({ email });
 
@@ -23,42 +22,13 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
         return res.status(400).send('User already exists');
     }
 
-    //Register the user with stripe
-    const userStripeAccount = await stripe.accounts.create({
-        type: 'express',
-        country: 'US',
-        default_currency: 'usd',
-        capabilities: {
-            card_payments: {requested: true},
-            transfers: {requested: true}
-        },
-        business_type: 'individual',
-        business_profile: {
-            product_description: "Driver or passenger"
-        },
-        company: {
-            address: {
-                city: 'Wellesley',
-                country: 'US',
-                line1: '231 Forest St',
-                postal_code: '02457',
-                state: 'MA'
-            }
-        },
-        email
-    })
-
-    console.log(userStripeAccount);
-
-    const stripeId = userStripeAccount.id;
-
-    user = new User({ email,
+    user = new User({ firstName,
+                      lastName,
+                      email,
                       password,
                       carModel: carModel ?? "",
                       carPlate: carPlate ?? "",
-                      carColor: carColor ?? "",
-                      stripeId,
-                      stripeComplete: false});
+                      carColor: carColor ?? ""});
 
     //Salt password with bcrypt
     const salt = await bcrypt.genSalt(10);
