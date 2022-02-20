@@ -14,16 +14,22 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 
 exports.registerUser = asyncHandler(async (req, res, next) => {
     //Destructure request body
-    const { email, password, carModel, carPlate, carColor } = req.body;
+    const { firstName, lastName, email, password, carModel, carPlate, carColor } = req.body;
 
     let user = await User.findOne({ email });
 
     //Check to see if user already exists
     if (user) {
-        return res.status(400).json('User already exists');
+        return res.status(400).send('User already exists');
     }
 
-    user = new User({ email, password, carModel, carPlate, carColor });
+    user = new User({ firstName,
+                      lastName,
+                      email,
+                      password,
+                      carModel: carModel ?? "",
+                      carPlate: carPlate ?? "",
+                      carColor: carColor ?? ""});
 
     //Salt password with bcrypt
     const salt = await bcrypt.genSalt(10);
