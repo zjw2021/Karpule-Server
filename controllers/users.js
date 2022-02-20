@@ -36,7 +36,7 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
     user.password = await bcrypt.hash(password, salt);
 
     try {
-        if (carModel.length !== 0 && carPlate.length !== 0 && carColor.length !== 0) {
+        if (!!carModel && !!carPlate && !!carColor) {
             user.isDriver = true;
         }
         else {
