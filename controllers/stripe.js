@@ -18,9 +18,13 @@ exports.authorizeStripeUser = asyncHandler(async (req, res, next) => {
     const stripeClientId = "";
     // Stripe did this in their example: protects from CSRF
     const sessionState = Math.random().toString(36).slice(2);
+    const jwt = req.header('x-auth-token');
+
+    // So that on the redirect, the jwt will be included
+    const sendState = sessionState + ":" + jwt;
     const parameters = {
         client_id: stripeClientId,
-        state: sessionState,
+        state: sendState,
         'capabilities[card_payments][requested]': 'true',
         'capabilities[transfers][requested]': 'true',
         'stripe_user[email]': user.email,
