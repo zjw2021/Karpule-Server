@@ -23,40 +23,35 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
         return res.status(400).send('User already exists');
     }
 
+    // Handle potentially null/undefined values for filled values about the car
+    const safeCarModel = carModel ?? "";
+    const safeCarPlate = carPlate ?? "";
+    const safeCarColor = carColor ?? "";
+
     user = new User({ firstName,
                       lastName,
                       email,
                       password,
-                      carModel: carModel ?? "",
-                      carPlate: carPlate ?? "",
-                      carColor: carColor ?? ""});
+                      carModel: safeCarModel,
+                      carPlate: safeCarPlate,
+                      carColor: safeCarColor});
 
     //Salt password with bcrypt
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
 
-    try {
-        if (!!carModel && !!carPlate && !!carColor) {
-            user.isDriver = true;
-        }
-        else {
-            user.isDriver = false;
-        }
-    }
-    catch (e) {
-        console.warn("One of carModel, carPlate, carColor was not a string:\n" + e);
-    }
-    finally {
-        //Save admin to database
-        await user.save();
+    // The user becomes an unverified driver if these fields are filled out
+    user.isDriver = safeCarModel.length > 0 && safeCarPlate.length > 0 && safeCarColor.length > 0;
+    console.log({ driver: user.isDriver });
 
-        const payload = { user: { id: user.id } };
+    //Save user to database
+    await user.save();
 
-        //Sign token and set expiration to 10 minutes
-        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 600 });
-        // res.header('x-auth-token', token).send(token);
-        res.json({ user, token })
-    }
+    const payload = { user: { id: user.id } };
+
+    //Sign token and set expiration to 10 minutes
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 600 });
+    res.json({ user, token })
 })
 
 exports.loginUser = asyncHandler(async (req, res, next) => {
