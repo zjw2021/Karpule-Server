@@ -10,12 +10,12 @@ const {
     authorizeStripeUser,
     finalizeStripeUser,
     isAuthorizedUser,
-    testMiddle
+    purchaseRide,
 } = require('../controllers/stripe');
 
 router.route('/authorize').get(authorizeStripeUser)
 router.route('/finalize').post(finalizeStripeUser)
 router.route('/isauthorized').get(isAuthorizedUser)
-router.route('/test').get(testMiddle)
+router.route('/purchaseride').post(purchaseRide)
 
 module.exports = router;
