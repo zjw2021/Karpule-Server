@@ -15,7 +15,7 @@ const {
 
 router.route('/authorize').get(authorizeStripeUser)
 router.route('/finalize').post(finalizeStripeUser)
-router.route('/isauthorized').post(isAuthorizedUser)
+router.route('/isauthorized').get(isAuthorizedUser)
 router.route('/test').get(testMiddle)
 
 module.exports = router;

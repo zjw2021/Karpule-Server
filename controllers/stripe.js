@@ -70,14 +70,8 @@ exports.finalizeStripeUser = asyncHandler(async (req, res, next) => {
     const userStripeId = response.stripe_user_id;
     user.stripeId = userStripeId;
 
-    await User.findByIdAndUpdate(userId, user, {}, (err, doc) => {
-        if (err) {
-            return res.sendStatus(500);
-        }
-        else {
-            res.sendStatus(200);
-        }
-    });
+    const updatedUser = await User.findByIdAndUpdate(userId, user);
+    return res.sendStatus(200);
 });
 
 // Determines if the user is fully authorized with Stripe and updates the user accordingly
