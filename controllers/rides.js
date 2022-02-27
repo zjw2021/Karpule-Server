@@ -55,7 +55,8 @@ exports.createRide = asyncHandler(async (req, res, next) => {
         pickupLocation,
         pickupTime,
         seatLimit,
-        seatFee
+        seatFee,
+        passengers: []
     });
 
     await ride.save();

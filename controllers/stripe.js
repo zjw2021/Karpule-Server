@@ -95,7 +95,7 @@ exports.finalizeStripeUser = asyncHandler(async (req, res, next) => {
 // Purchases a ride with the given user
 exports.purchaseRide = asyncHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const rideId = req.body.ride._id;
+    const rideId = req.body.ride;
     const user = await User.findById(userId);
     const ride = await Ride.findById(rideId);
 
@@ -126,7 +126,7 @@ exports.purchaseRide = asyncHandler(async (req, res, next) => {
 
     // The payment session for Stripe Checkouts, where the user will pay
     const session = await stripe.checkout.sessions.create({
-        success_url: 'http://localhost:3000/purchasesuccess',
+        success_url: `http://localhost:3000/purchasesuccess/?ride=${rideId}`,
         cancel_url: 'http://localhost:3000/purchasecancel',
         line_items: [
             { price: ridePriceId, quantity: 1 }
@@ -136,5 +136,5 @@ exports.purchaseRide = asyncHandler(async (req, res, next) => {
     });
 
     const sessionUrl = session.url;
-    res.redirect(sessionUrl);
+    res.json({url: sessionUrl}).end();
 });
