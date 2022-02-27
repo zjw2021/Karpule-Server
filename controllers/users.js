@@ -119,11 +119,13 @@ exports.loginWithToken = asyncHandler(async (req, res, next) => {
     if (!token) return res.status(401).json("No token");
 
     try {
-        jwt.verify(token, JWT_SECRET, (err, info) => {
+        jwt.verify(token, JWT_SECRET, async (err, info) => {
             if (err) {
                 return res.sendStatus(403);
             }
-            res.sendStatus(200);
+            const user = await User.findById(info.user.id);
+
+            res.status(200).json({user, token});
         });
     }
     catch (err) {
