@@ -114,7 +114,7 @@ exports.registerDriver = asyncHandler(async (req, res, next) => {
 
 // Verify the token
 exports.loginWithToken = asyncHandler(async (req, res, next) => {
-    const jwt = req.body.token;
+    const token = req.body.token;
 
     if (!token) return res.status(401).json("No token");
 
