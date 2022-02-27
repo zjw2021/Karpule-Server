@@ -51,7 +51,7 @@ exports.isAuthorizedUser = asyncHandler(async (req, res, next) => {
         res.sendStatus(401);
     }
 
-    res.status(200).json({ complete: user.stripeComplete });
+    res.status(200).json({ complete: user.canRide });
 });
 
 // Finalizes Stripe user authorization
@@ -68,30 +68,37 @@ exports.finalizeStripeUser = asyncHandler(async (req, res, next) => {
     });
 
     const userStripeId = response.stripe_user_id;
+    const userStripeAccount = await stripe.accounts.retrieve(userStripeId);
+    // Successfully completed necessary rider fields for Stripe
+    const canRide = userStripeAccount.details_submitted;
+    // Successfully completed necessary driver fields for Stripe (can earn money)
+    const canDrive = userStripeAccount.requirements.eventually_due.length === 0;
+
     user.stripeId = userStripeId;
+    user.canRide = canRide;
+    user.canDrive = canDrive;
+
+    // Creates a Stripe Customer object so that they can pay
+    const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: { 'stripeAccId': userStripeId }
+    });
+
+    user.stripeCustomerId = customer.id;
 
     const updatedUser = await User.findByIdAndUpdate(userId, user);
+
     return res.sendStatus(200);
-});
-
-// Determines if the user is fully authorized with Stripe and updates the user accordingly
-exports.updateAuth = asyncHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const user = await User.findById(userId);
-    const userStripeId = user.stripeId;
-    const userStripeAccount = stripe.accounts.retrieve(userStripeId);
-
-    // TODO: find out how to distinguish between authenticated and non-authenticated accounts
 });
 
 // Purchases a ride with the given user
 exports.purchaseRide = asyncHandler(async (req, res, next) => {
     const userId = req.user.id;
-    const rideId = req.ride._id;
+    const rideId = req.body.ride._id;
     const user = await User.findById(userId);
     const ride = await Ride.findById(rideId);
 
-    if (ride.seatLimit >= ride.passengers.length) {
+    if (ride.passengers.length >= ride.seatLimit) {
         return res.status(400).json("Ride is full");
     }
 
@@ -118,24 +125,15 @@ exports.purchaseRide = asyncHandler(async (req, res, next) => {
 
     // The payment session for Stripe Checkouts, where the user will pay
     const session = await stripe.checkout.sessions.create({
-        success_url: '',
-        cancel_url: '',
+        success_url: 'http://localhost:3000/purchasesuccess',
+        cancel_url: 'http://localhost:3000/purchasecancel',
         line_items: [
             { price: ridePriceId, quantity: 1 }
         ],
         mode: 'payment',
-        customer: user.stripeId,
+        customer: user.stripeCustomerId,
     });
 
     const sessionUrl = session.url;
     res.redirect(sessionUrl);
-});
-
-exports.testMiddle = asyncHandler(async (req, res, next) => {
-    const userId = req.user.id;
-    const user = await User.findById(userId);
-    const userStripeId = user.stripeId;
-    const userStripeAccount = await stripe.accounts.retrieve(userStripeId);
-    console.log(userStripeAccount);
-    res.sendStatus(200);
 });

@@ -20,9 +20,8 @@ exports.getRide = asyncHandler(async (req, res, next) => {
 
 // Ride Driver Controllers
 exports.createRide = asyncHandler(async (req, res, next) => {
-
     //get token, and search user by id from token
-    const driver = req.params.id
+    const driver = req.params.id;
 
     const {
         destination,
@@ -32,9 +31,23 @@ exports.createRide = asyncHandler(async (req, res, next) => {
         seatFee
     } = req.body
 
-    let user = User.findById(driver)
+    let user = await User.findById(driver)
 
     if (!user) return res.status(400).json("No user");
+    const requirements = [
+        { name: "isDriver", field: user.isDriver, desc: "Car details have not been filled out" },
+        { name: "verified", field: user.driverVerified, desc: "Driver not verified by Karpule" },
+        { name: "carDrive", field: user.canDrive, desc: "Driver cannot earn money from rides (please complete Stripe)" }
+    ];
+
+    console.log(user);
+    for (const requirement of requirements) {
+        if (!requirement.field) {
+            console.log(requirement.name);
+            console.log(requirement.desc);
+            return res.status(400).json(requirement.desc);
+        }
+    }
 
     const ride = new Ride({
         driver,
