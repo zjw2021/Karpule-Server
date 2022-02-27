@@ -18,6 +18,6 @@ router.route('/authorize').get(authorizeStripeUser)
 router.route('/finalize').post(finalizeStripeUser)
 router.route('/isauthorized').get(isAuthorizedUser)
 router.route('/purchaseride').post(purchaseRide)
-router.route('/completeride').put(completeRide)
+router.route('/completeride/:id').put(completeRide)
 
 module.exports = router;
