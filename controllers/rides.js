@@ -10,7 +10,7 @@ const asyncHandler = require('../middleware/asyncHandler')
 
 exports.getRides = asyncHandler(async (req, res, next) => {
     const rides = await Ride.find();
-    const incompleteRides = rides.filter((ride) => { !ride.isComplete });
+    const incompleteRides = rides.filter((ride) => !ride.isComplete);
     res.json({ rides: incompleteRides });
 })
 
