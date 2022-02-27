@@ -90,21 +90,6 @@ exports.deleteRide = asyncHandler(async (req, res, next) => {
     res.status(200).json(`Ride ${req.params.id} has been deleted`);
 })
 
-exports.completeRide = asyncHandler(async (req, res, next) => {
-    let ride = await Ride.findById(req.params.id)
-
-    if (!ride) {
-        return next(new ErrorResponse("No ride found", 404))
-    }
-
-    ride = await Ride.findByIdAndUpdate(req.params.id, {isComplete: true}, {
-        new: true,
-        runValidators: true
-    })
-
-    res.status(200).json(ride)
-})
-
 // Ride Rider Controllers
 exports.joinRide = asyncHandler(async (req, res, next) => {
     // get ride

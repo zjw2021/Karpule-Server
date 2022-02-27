@@ -11,11 +11,13 @@ const {
     finalizeStripeUser,
     isAuthorizedUser,
     purchaseRide,
+    completeRide
 } = require('../controllers/stripe');
 
 router.route('/authorize').get(authorizeStripeUser)
 router.route('/finalize').post(finalizeStripeUser)
 router.route('/isauthorized').get(isAuthorizedUser)
 router.route('/purchaseride').post(purchaseRide)
+router.route('/completeride').put(completeRide)
 
 module.exports = router;

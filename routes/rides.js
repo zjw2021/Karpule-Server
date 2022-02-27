@@ -19,7 +19,6 @@ router.route('/get/:id').get(getRide)
 router.route('/create/:id').post(createRide)
 router.route('/edit/:id').put(editRide)
 router.route('/delete/:id').delete(deleteRide)
-router.route('/complete/:id').put(completeRide)
 
 router.route('/join/:id').put(joinRide)
 router.route('/leave/:id').post(leaveRide)

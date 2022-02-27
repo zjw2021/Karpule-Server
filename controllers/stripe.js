@@ -138,3 +138,31 @@ exports.purchaseRide = asyncHandler(async (req, res, next) => {
     const sessionUrl = session.url;
     res.json({url: sessionUrl}).end();
 });
+
+// Complete the ride and pay the driver
+exports.completeRide = asyncHandler(async (req, res, next) => {
+    const driverId = req.user.id;
+    const rideId = req.params.id;
+    const driver = await User.findById(driverId);
+    const ride = await Ride.findById(rideId);
+
+    if (!ride) {
+        return res.status(400).json("No ride found");
+    }
+
+    const updatedRide = await Ride.findByIdAndUpdate(req.params.id, { isComplete: true }, {
+        new: true,
+        runValidators: true
+    });
+
+    const paymentAmount = ride.seatFee * ride.passengers.length;
+    const driverStripeId = driver.stripeId;
+
+    const transfer = await stripe.transfers.create({
+        amount: paymentAmount,
+        currency: "usd",
+        destination: driverStripeId
+    });
+
+    res.status(200).json(updatedRide);
+});
