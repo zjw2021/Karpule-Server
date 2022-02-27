@@ -1,5 +1,6 @@
 const querystring = require('querystring');
-const stripe = require('stripe')("")
+const process = require('process');
+const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 
 const asyncHandler = require('../middleware/asyncHandler');
 
@@ -15,7 +16,7 @@ exports.authorizeStripeUser = asyncHandler(async (req, res, next) => {
     const firstName = user.firstName;
     const lastName = user.lastName;
 
-    const stripeClientId = "";
+    const stripeClientId = process.env.STRIPE_CLIENT_ID;
     // Stripe did this in their example: protects from CSRF
     const sessionState = Math.random().toString(36).slice(2);
     const jwt = req.header('x-auth-token');

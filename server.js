@@ -1,4 +1,5 @@
 const express = require('express')
+const _ = require('dotenv').config();
 const app = express()
 
 // Connect database to server
