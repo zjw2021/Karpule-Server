@@ -9,8 +9,9 @@ const Ride = require('../models/Ride')
 const asyncHandler = require('../middleware/asyncHandler')
 
 exports.getRides = asyncHandler(async (req, res, next) => {
-    const rides = await Ride.find()
-    res.json({ rides })
+    const rides = await Ride.find();
+    const incompleteRides = rides.filter((ride) => { !ride.isComplete });
+    res.json({ rides: incompleteRides });
 })
 
 exports.getRide = asyncHandler(async (req, res, next) => {
