@@ -109,6 +109,12 @@ exports.requestRide = asyncHandler(async (req, res, next) => {
 exports.acceptRequest = asyncHandler(async (req, res, next) => {
     const ride = await Ride.findById(req.params.id);
     const passenger = req.body;
+    const driver = req.user;
+
+    if (!driver || driver.id !== ride.driver) {
+        return res.sendStatus(403);
+    }
+
     if (!passenger) {
         return res.sendStatus(404);
     }
