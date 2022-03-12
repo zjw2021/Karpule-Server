@@ -99,7 +99,7 @@ exports.purchaseRide = asyncHandler(async (req, res, next) => {
     const user = await User.findById(userId);
     const ride = await Ride.findById(rideId);
 
-    if (!ride.awaitingPayment.contains(req.user)) {
+    if (!ride.awaitingPayment.includes(req.user)) {
         return res.sendStatus(404);
     }
 
