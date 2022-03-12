@@ -99,6 +99,10 @@ exports.purchaseRide = asyncHandler(async (req, res, next) => {
     const user = await User.findById(userId);
     const ride = await Ride.findById(rideId);
 
+    if (!ride.awaitingPayment.contains(req.user)) {
+        return res.sendStatus(404);
+    }
+
     if (ride.passengers.length >= ride.seatLimit) {
         return res.status(400).json("Ride is full");
     }

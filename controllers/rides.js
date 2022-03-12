@@ -90,20 +90,57 @@ exports.deleteRide = asyncHandler(async (req, res, next) => {
     res.status(200).json(`Ride ${req.params.id} has been deleted`);
 })
 
+// Request to join the ride
+exports.requestRide = asyncHandler(async (req, res, next) => {
+    const ride = await Ride.findById(req.params.id);
+    const passenger = req.user;
+    if (!passenger) {
+        return res.sendStatus(403);
+    }
+    await ride.requested.addToSet(passenger);
+    await ride.save();
+
+    const updatedRide = await Ride.findById(req.params.id);
+
+    res.json({ ride: updatedRide }).end();
+});
+
+// Accept a passenger into the ride
+exports.acceptRequest = asyncHandler(async (req, res, next) => {
+    const ride = await Ride.findById(req.params.id);
+    const passenger = req.body;
+    if (!passenger) {
+        return res.sendStatus(404);
+    }
+
+    if (!ride.requested.contains(passenger)) {
+        return res.sendStatus(404);
+    }
+
+    await ride.requested.pull(passenger);
+    await ride.awaitingPayment.addToSet(passenger);
+    await ride.save();
+
+    const updatedRide = await Ride.findById(req.params.id);
+    res.json({ ride: updatedRide }).save();
+});
+
 // Ride Rider Controllers
 exports.joinRide = asyncHandler(async (req, res, next) => {
     // get ride
     const ride = await Ride.findById(req.params.id)
+    const passenger = req.user;
+    if (!passenger) {
+        return res.sendStatus(403);
+    }
 
-    // const { token } = req.body
-
-    const rider = req.body
-
-    await ride.passengers.push(rider);
+    await ride.awaitingPayment.pull(passenger);
+    await ride.passengers.push(passenger);
     await ride.save();
 
-    res.json({ ride })
-})
+    const updatedRide = await Ride.findById(req.params.id);
+    res.json({ ride: updatedRide }).end();
+});
 
 exports.leaveRide = asyncHandler(async (req, res, next) => {
     const ride = await Ride.findById(req.params.id)

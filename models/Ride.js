@@ -29,8 +29,17 @@ const rideSchema = new Schema ({
         type: Boolean,
         default: false
     },
+    requested: {
+        type: Array,
+        default: []
+    },
+    awaitingPayment: {
+        type: Array,
+        default: []
+    },
     passengers: {
-        type: Array
+        type: Array,
+        default: []
     },
     date: {
         type: Date,

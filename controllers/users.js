@@ -50,7 +50,7 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
     const payload = { user: { id: user.id } };
 
     //Sign token and set expiration to 10 minutes
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 600 });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 3600 });
     res.json({ user, token })
 })
 
@@ -76,7 +76,7 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
     const payload = { user: { id: user.id } };
 
     //Sign token and set expiration to 10 minutes
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 600 });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 3600 });
     // res.header('x-auth-token', token).send(token);
     res.json({ user, token })
 })
