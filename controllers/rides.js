@@ -111,6 +111,7 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
     const passenger = req.body;
     const driver = req.user;
 
+
     if (!driver || driver.id !== ride.driver) {
         return res.sendStatus(403);
     }
@@ -119,16 +120,16 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
         return res.sendStatus(404);
     }
 
-    if (!ride.requested.contains(passenger)) {
+    if (!ride.requested.map((obj) => obj.id).includes(passenger.passenger)) {
         return res.sendStatus(404);
     }
 
-    await ride.requested.pull(passenger);
+    await ride.requested.pull({ id: passenger.passenger });
     await ride.awaitingPayment.addToSet(passenger);
     await ride.save();
 
     const updatedRide = await Ride.findById(req.params.id);
-    res.json({ ride: updatedRide }).save();
+    res.json({ ride: updatedRide }).end();
 });
 
 // Ride Rider Controllers
@@ -140,8 +141,8 @@ exports.joinRide = asyncHandler(async (req, res, next) => {
         return res.sendStatus(403);
     }
 
-    await ride.awaitingPayment.pull(passenger);
-    await ride.passengers.push(passenger);
+    await ride.awaitingPayment.pull({ passenger: passenger.id });
+    await ride.passengers.addToSet(passenger);
     await ride.save();
 
     const updatedRide = await Ride.findById(req.params.id);
