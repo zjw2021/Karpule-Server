@@ -22,5 +22,8 @@ app.use('/api/rides', rides);
 const stripe = require('./routes/stripe');
 app.use('/api/stripe', stripe);
 
+const events = require('./routes/events');
+app.use('/api/events', events);
+
 const PORT = 9000
 app.listen(PORT, console.log('Karpule backend listening on part ' + PORT))

@@ -1,5 +1,6 @@
 
 const { Schema, model } = require('mongoose');
+const Event = require('./Event');
 
 const rideSchema = new Schema ({
     driver: {
@@ -44,6 +45,9 @@ const rideSchema = new Schema ({
     date: {
         type: Date,
         default: Date.now()
+    },
+    eventName: {
+        type: String,
     }
 });
 

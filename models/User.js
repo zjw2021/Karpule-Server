@@ -65,7 +65,11 @@ const userSchema = new Schema ({
     canDrive: {
         type: Boolean,
         default: false
+    },
+    event: {
+        type: String,
     }
+
 });
 
 const User = model('users', userSchema);
