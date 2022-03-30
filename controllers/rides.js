@@ -29,7 +29,8 @@ exports.createRide = asyncHandler(async (req, res, next) => {
         pickupLocation,
         pickupTime,
         seatLimit,
-        seatFee
+        seatFee,
+        eventName
     } = req.body
 
     let user = await User.findById(driver)
@@ -85,6 +86,24 @@ exports.editRide = asyncHandler(async (req, res, next) => {
     res.status(200).json(ride)
 })
 
+// Cancel a ride with no passengers
+exports.cancelRide = asyncHandler(async (req, res, next) => {
+    const driver = req.user;
+    const rideId = req.params.id;
+    const ride = await Ride.findById(rideId);
+
+    if (ride.driver !== driver) {
+        return res.sendStatus(403);
+    }
+
+    if (ride.passengers.length !== 0) {
+        return res.status(400).json("Cannot cancel ride which already has passengers");
+    }
+
+    await Ride.findByIdAndDelete(rideId);
+    res.sendStatus(200);
+});
+
 exports.deleteRide = asyncHandler(async (req, res, next) => {
     await Ride.findByIdAndDelete(req.params.id);
     res.status(200).json(`Ride ${req.params.id} has been deleted`);
@@ -134,6 +153,7 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
 
 // Ride Rider Controllers
 exports.joinRide = asyncHandler(async (req, res, next) => {
+    console.log("JOINING RIDE");
     // get ride
     const ride = await Ride.findById(req.params.id)
     const passenger = req.user;
